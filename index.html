@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Economic Calendar & TradingView Chart</title>
+    <meta name="description" content="This page displays a real-time Economic Calendar and a TradingView chart.">
+    <meta name="keywords" content="Economic Calendar, TradingView, Financial Events, Real-time Data, Stock Chart">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            height: 70px;
+            z-index: 1050;
+            position: fixed;
+            top: 0;
+            width: 100%;
+        }
+
+        .tab-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 70px;
+        }
+
+        .tab-pane {
+            flex: 1;
+            height: calc(100% - 70px);
+            position: relative;
+        }
+
+        .tradingview-widget-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .tradingview-widget-container__widget {
+            width: 100%;
+            height: 100%;
+        }
+
+        .content-H6_2ZGVv, .label__link-dzbd7lyV, .label-dzbd7lyV, .text-button-H6_2ZGVv {
+            display: none !important;
+        }
+
+        .modal-fullscreen {
+            width: 100%;
+            height: calc(100% - 70px);
+            margin: 0;
+            top: 70px;
+            left: 0;
+            position: fixed;
+            background-color: white;
+            z-index: 1040;
+            display: none;
+            overflow: hidden;
+        }
+
+        .modal-fullscreen.active {
+            display: block;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            color: #000;
+            cursor: pointer;
+            z-index: 1050;
+        }
+
+        /* Watchlist Panel */
+        .watchlist-panel {
+            width: 250px;
+            background-color: #ffffff;
+            border-right: 1px solid #dee2e6;
+            padding: 15px;
+            overflow-y: auto;
+            position: fixed;
+            top: 70px;
+            bottom: 0;
+            right: 0;
+            z-index: 1030;
+        }
+
+        .watchlist-panel h5 {
+            margin-bottom: 15px;
+        }
+
+        .watchlist-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .watchlist-panel {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <span style="color: white; font-size: 1.5rem;">Economic Calendar</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTabs" aria-controls="navbarTabs" aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTabs">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="calendarTabTrigger" href="#calendarTab">Calendar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="chartTabTrigger">Chart</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="calendarTab">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+                {
+                    "colorTheme": "light",
+                    "isTransparent": false,
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "en",
+                    "importanceFilter": "-1,0,1",
+                    "countryFilter": "ar,au,br,ca,cn,fr,de,in,id,it,jp,kr,mx,ru,sa,za,tr,gb,us,eu"
+                }
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Modal for Chart -->
+    <div class="modal-fullscreen" id="chartModal">
+        <span class="close-btn" id="closeChart">&times;</span>
+        <div class="tradingview-widget-container">
+            <div id="tradingview_chart"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
+                new TradingView.widget({
+                    "width": "100%",
+                    "height": "100%",
+                    "symbol": "NASDAQ:AAPL", // Default symbol, you can change or make dynamic
+                    "interval": "D",
+                    "timezone": "Etc/UTC",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "en",
+                    "toolbar_bg": "#f1f3f6",
+                    "enable_publishing": true,
+                    "allow_symbol_change": true,
+                    "container_id": "tradingview_chart",
+                    "studies": [
+                        "MACD@tv-basicstudies",
+                        "RSI@tv-basicstudies"
+                    ],
+                    "drawingTools": true,
+                    "watchlist": [
+                        "NASDAQ:AAPL",
+                        "NASDAQ:MSFT",
+                        "NASDAQ:GOOGL",
+                        "NASDAQ:AMZN",
+                        "NASDAQ:TSLA"
+                    ],
+                    "autosize": true
+                });
+            </script>
+        </div>
+    </div>
+
+   
+        <!-- Add more watchlist items as needed -->
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Remove unwanted TradingView elements
+            function removeTradingViewElements() {
+                var elements = document.querySelectorAll('.content-H6_2ZGVv, .label__link-dzbd7lyV, .label-dzbd7lyV, .text-button-H6_2ZGVv');
+                elements.forEach(function(element) {
+                    element.remove();
+                });
+            }
+            setTimeout(removeTradingViewElements, 3000);
+
+            // Handle Chart Modal
+            const chartModal = document.getElementById('chartModal');
+            const chartTabTrigger = document.getElementById('chartTabTrigger');
+            const calendarTabTrigger = document.getElementById('calendarTabTrigger');
+            const closeChart = document.getElementById('closeChart');
+
+            chartTabTrigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                chartModal.classList.add('active');
+                // Optionally switch to the chart tab if using Bootstrap tabs
+            });
+
+            closeChart.addEventListener('click', function () {
+                chartModal.classList.remove('active');
+            });
+
+            calendarTabTrigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                chartModal.classList.remove('active');
+            });
+
+            // Optional: Handle clicking outside the modal to close
+            window.addEventListener('click', function(event) {
+                if (event.target == chartModal) {
+                    chartModal.classList.remove('active');
+                }
+            });
+
+            // Example: Update Watchlist Dynamically (Requires API Integration)
+            // Here you can add JavaScript to dynamically update the watchlist panel
+            // based on user data fetched from your server or TradingView API.
+
+            // Note: Full synchronization with a real TradingView account requires backend support
+            // and secure handling of user authentication tokens, which is beyond the scope of this
+            // client-side implementation.
+        });
+    </script>
+</body>
+</html>
